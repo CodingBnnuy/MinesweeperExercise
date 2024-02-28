@@ -7,11 +7,12 @@ import java.util.Collections;
 /**
  * Main
  * 
- * Version 1
+ * Version 2
+ * Added Easy Start
  * 
- * 19. Feb 2024
+ * 28. Feb 2024
  * 
- * @author Sam
+ * @author CodingBnnuy
  *
  */
 
