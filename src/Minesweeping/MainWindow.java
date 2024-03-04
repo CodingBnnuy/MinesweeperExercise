@@ -7,20 +7,31 @@ import java.util.Collections;
 /**
  * Main
  * 
- * Version 2
- * Added Easy Start
+ * 
+ * 
+ * Version 3
+ * - Improve Performance
+ * - Add Flexible Size
  * 
  * 28. Feb 2024
  * 
  * @author CodingBnnuy
  *
+ *
+ * Version History:
+ * Version 1
+ * - Add base functionality
+ * 
+ * Version 2
+ * - Added Easy Start
  */
 
 public class MainWindow {
 	private int minefield [][];
-	private int cols[] = {9, 16, 30}; //x axis
-	private int rows[] = {9, 16, 16}; //y axis
-	private int mines[] = {10, 40, 99};
+	private int cols[] = {9, 16, 30, 0}; //x axis
+	private int rows[] = {9, 16, 16, 0}; //y axis
+	private int mines[] = {10, 40, 99, 0};
+	private int dir[][] = { {-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}}; //2D Array to point to every surrounding field
 	private int safeFields;
 	private boolean tempField [][];
 	private ArrayList<ZeroHelper> zeroes = new ArrayList<ZeroHelper>();
@@ -37,7 +48,7 @@ public class MainWindow {
 		 * 				 40 mines
 		 * 
 		 * difficulty 2: hard
-		 * 				 16x30 field
+		 * 				 30x16 field
 		 * 				 99 mines 
 		 * 
 		 * 
@@ -54,17 +65,17 @@ public class MainWindow {
 		int difficulty = 0;
 		
 		Scanner userInput = new Scanner(System.in);
-		System.out.println("Choose Difficulty: 0 = Easy; 1 = Medium; 2 = Hard");
+		System.out.println("Choose Difficulty: 0 = Easy; 1 = Medium; 2 = Hard; 3 = Custom");
 		do {
 			int input = 0;
 			validInput = false;
 			try {
 				input = userInput.nextInt();
-				if(input < 3 && input >= 0) {
+				if(input < 4 && input >= 0) {
 					validInput = true;
 					difficulty = input;
 				} else {
-					System.out.println("Input was not within bounds. Choose from: 0 = Easy; 1 = Medium; 2 = Hard!");
+					System.out.println("Input was not within bounds. Choose from: 0 = Easy; 1 = Medium; 2 = Hard; 3 = Custom!");
 				}
 			} catch (Exception e) {
 				System.out.println("Input was not a valid Integer!");
@@ -72,6 +83,47 @@ public class MainWindow {
 		} while(!validInput);
 		
 		MainWindow main = new MainWindow();
+		
+		if(difficulty == 3) {
+			System.out.println("Choose amount of rows!");
+			do {
+				int input = 0;
+				validInput = false;
+				try {
+					input = userInput.nextInt();
+					if (input > 0) {
+						validInput = true;
+						main.rows[3] = input;
+					}
+				} catch(Exception e) {}
+			} while(!validInput);
+			
+			System.out.println("Choose amount of columnns!");
+			do {
+				int input = 0;
+				validInput = false;
+				try {
+					input = userInput.nextInt();
+					if (input > 0) {
+						validInput = true;
+						main.cols[3] = input;
+					}
+				} catch(Exception e) {}
+			} while(!validInput);
+			
+			System.out.println("Choose amount of mines!");
+			do {
+				int input = 0;
+				validInput = false;
+				try {
+					input = userInput.nextInt();
+					if (input > 0) {
+						validInput = true;
+						main.mines[3] = input;
+					}
+				} catch(Exception e) {}
+			} while(!validInput);
+		}
 		
 		main.setField(difficulty);
 		main.easyStarter();		
@@ -147,74 +199,19 @@ public class MainWindow {
 			int col = (int)(Math.random() * iCols);
 			
 			//choose random field until empty one has been found
-			while(minefield[col][row] != 0) {
+			while(minefield[col][row] == 9) {
 				row = (int)(Math.random() * iRows);
 				col = (int)(Math.random() * iCols);
 			}
 			
 			//Turn field into mine
 			minefield[col][row] = 9;
-		}
-		
-		for (int col = 0; col<iCols; col++) {
-			for (int row = 0; row<iRows; row++) {
-				if (minefield[col][row] != 9) { //Don't check fields that have mines
-					//Checks field to the top left for mines
-					try {
-						if(minefield[col-1][row-1] == 9) {
-							minefield[col][row] += 1;
-						}
-					} catch(Exception e) {} //Empty Catch to continue after "Array Index out of Bounds" Exception
-					
-					//Checks field to the top for mines
-					try {
-						if(minefield[col-1][row] == 9) {
-							minefield[col][row] += 1;
-						}
-					} catch(Exception e) {}
-					
-					//Checks field to the top right for mines
-					try {
-						if(minefield[col-1][row+1] == 9) {
-							minefield[col][row] += 1;
-						}
-					} catch(Exception e) {}
-					
-					//Checks field to the left for mines
-					try {
-						if(minefield[col][row-1] == 9) {
-							minefield[col][row] += 1;
-						}
-					} catch(Exception e) {}
-					
-					//Checks field to the right for mines
-					try {
-						if(minefield[col][row+1] == 9) {
-							minefield[col][row] += 1;
-						}
-					} catch(Exception e) {}
-					
-					//Checks field to the bottom left for mines
-					try {
-						if(minefield[col+1][row-1] == 9) {
-							minefield[col][row] += 1;
-						}
-					} catch(Exception e) {}
-					
-					//Checks field to the bottom for mines
-					try {
-						if(minefield[col+1][row] == 9) {
-							minefield[col][row] += 1;
-						}
-					} catch(Exception e) {}
-					
-					//Checks field to the bottom right for mines
-					try {	
-						if(minefield[col+1][row+1] == 9) {
-							minefield[col][row] += 1;
-						}						
-					} catch(Exception e) {}
-				}
+			for (int j = 0; j<dir.length; j++) { //Increase the value of each surrounding field by 1
+				try {
+					if(minefield[col+dir[j][0]][row+dir[j][1]] != 9) {
+						minefield[col+dir[j][0]][row+dir[j][1]] += 1;
+					}
+				} catch(Exception e) {}
 			}
 		}
 	}
@@ -224,46 +221,13 @@ public class MainWindow {
 		minefield[col][row] += 10;
 		safeFields -= 1;
 		if (minefield[col][row] == 10) { //If the revealed field has no surrounding mines, reveal all surrounding fields
-			try {
-				if(minefield[col-1][row-1] < 10) {
-					checkField(col-1, row-1);
-				}
-			} catch (Exception e) {}
-			try {
-				if(minefield[col-1][row] < 10) {
-					checkField(col-1, row);
-				}
-			} catch (Exception e) {}
-			try {
-				if(minefield[col-1][row+1] < 10) {
-					checkField(col-1, row+1);
-				}
-			} catch (Exception e) {}
-			try {
-				if(minefield[col][row-1] < 10) {
-					checkField(col, row-1);
-				}
-			} catch (Exception e) {}
-			try {
-				if(minefield[col][row+1] < 10) {
-					checkField(col, row+1);
-				}
-			} catch (Exception e) {}
-			try {
-				if(minefield[col+1][row-1] < 10) {
-					checkField(col+1, row-1);
-				}
-			} catch (Exception e) {}
-			try {
-				if(minefield[col+1][row] < 10) {
-					checkField(col+1, row);
-				}
-			} catch (Exception e) {}
-			try {
-				if(minefield[col+1][row+1] < 10) {
-					checkField(col+1, row+1);
-				}
-			} catch (Exception e) {}
+			for(int i = 0; i<dir.length; i++) {
+				try {
+					if(minefield[col+dir[i][0]][row+dir[i][1]] < 10) {
+						checkField(col+dir[i][0], row+dir[i][1]);
+					}
+				} catch(Exception e) {}
+			}
 		}
 	}
 	
