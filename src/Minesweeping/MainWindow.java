@@ -323,50 +323,18 @@ public class MainWindow {
 	}
 	
 	//Recursively counts all adjacent 0's
-	public int CountAdjacent(int row, int col) {
+	public int CountAdjacent(int col, int row) {
 		int counter = 1;
 		
-		tempField[row][col] = false;		//Deactivate the current space (before the recursive calls), so it doesn't get counted twice
-		try {
-			if(tempField[row-1][col-1]) {
-				counter += CountAdjacent(row-1, col-1);
-			}
-		} catch(Exception e) {}
-		try {
-			if(tempField[row-1][col]) {
-				counter += CountAdjacent(row-1, col);
-			}
-		} catch(Exception e) {}
-		try {
-			if(tempField[row-1][col+1]) {
-				counter += CountAdjacent(row-1, col+1);
-			}
-		} catch(Exception e) {}
-		try {
-			if(tempField[row][col-1]) {
-				counter += CountAdjacent(row, col-1);
-			}
-		} catch(Exception e) {}
-		try {
-			if(tempField[row][col+1]) {
-				counter += CountAdjacent(row, col+1);
-			}
-		} catch(Exception e) {}
-		try {
-			if(tempField[row+1][col-1]) {
-				counter += CountAdjacent(row+1, col-1);
-			}
-		} catch(Exception e) {}
-		try {
-			if(tempField[row+1][col]) {
-				counter += CountAdjacent(row+1, col);
-			}
-		} catch(Exception e) {}
-		try {
-			if(tempField[row+1][col+1]) {
-				counter += CountAdjacent(row+1, col+1);
-			}
-		} catch(Exception e) {}
+		tempField[col][row] = false;		//Deactivate the current space (before the recursive calls), so it doesn't get counted twice
+		
+		for(int i = 0; i < dir.length; i++) {
+			try {
+				if(tempField[col+dir[i][0]][row+dir[i][1]]) {
+					counter += CountAdjacent(col+dir[i][0], row+dir[i][1]);
+				}				
+			} catch(Exception e) {} 
+		}
 		
 		return counter;
 	}
